@@ -110,14 +110,26 @@ class Block3(tf.Module):
 
 
 model = SpeckModel()
-
-print("Creating jpg...")
-tf.keras.utils.plot_model(
-    model, to_file='model.png', show_shapes=False, show_dtype=False,
-    show_layer_names=True, rankdir='TB', expand_nested=True, dpi=150
-)
-print("yeet")
-
+model.compile(
+        optimizer=keras.optimizers.Adam(),
+        loss = keras.losses.SparceCategoricalCrossentropy(),
+        metrics=[keras.metrics.SparseCategoricalAccuracy()],
+        )
+history = model.fit(
+        x_train,
+        y_train,
+        batch_size=2500,
+        epochs=10,
+        validation_data=(x_val, y_val)
+        )
+# 
+# print("Creating jpg...")
+# tf.keras.utils.plot_model(
+#     model, to_file='model.png', show_shapes=False, show_dtype=False,
+#     show_layer_names=True, rankdir='TB', expand_nested=True, dpi=150
+# )
+# print("yeet")
+# 
 
 
 
