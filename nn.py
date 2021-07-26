@@ -2,15 +2,13 @@ import tensorflow as tf
 from tensorflow import keras
 import speck
 
-x_train, y_train = speck.make_train_data(10**7, 5) 
-x_val, y_val = speck.make_train_data(10**6, 5)
 class SpeckModel(keras.Model):
-    def __init__(self, depth=10, **kwargs):
+    def __init__(self, depth=10, reg_param=0.0001, **kwargs):
         super(SpeckModel, self).__init__(**kwargs)
 
-        self.block1 = Block1()
-        self.res_tower = [Block2i() for _ in range(depth)]
-        self.block3 = Block3()
+        self.block1 = Block1(reg_param=reg_param)
+        self.res_tower = [Block2i(reg_param=reg_param) for _ in range(depth)]
+        self.block3 = Block3(reg_param=reg_param)
 
     def call(self, inputs, training=False):
         x = self.block1(inputs)
@@ -109,22 +107,31 @@ class Block3(keras.layers.Layer):
 
 
         
-        
 
+def cyclic_lr(num_epochs, high_lr, low_lr):
+    res = lambda i: low_lr + ((num_epochs-1) - i % num_epochs)/(num_epochs-1) * (high_lr - low_lr);
+    return(res);
 
-model = SpeckModel()
-model.compile(
-        optimizer=keras.optimizers.Adam(),
-        loss = keras.losses.BinaryCrossentropy(),
-        metrics=["acc"],
-        )
-history = model.fit(
-        x_train,
-        y_train,
-        batch_size=50000,
-        epochs=10,
-        validation_data=(x_val, y_val)
-        )
+if __name__ == "__main__":
+
+    x_train, y_train = speck.make_train_data(10**7, 5) 
+    x_val, y_val = speck.make_train_data(10**6, 5)
+
+    lr = keras.callbacks.LearningRateScheduler(cyclic_lr(10,0.002, 0.0001));
+
+    model = SpeckModel(depth=10, reg_param=10**-5)
+    model.compile(
+            optimizer=keras.optimizers.Adam(),
+            loss = keras.losses.BinaryCrossentropy(),
+            metrics=["acc"],
+            )
+    history = model.fit(
+            x_train,
+            y_train,
+            batch_size=50000,
+            epochs=200,
+            validation_data=(x_val, y_val)
+            )
 # 
 # print("Creating jpg...")
 # tf.keras.utils.plot_model(
