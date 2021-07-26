@@ -21,12 +21,12 @@ class SpeckModel(keras.Model):
         return x
 
 
-class Block1(tf.Module):
-    def __init__(self, **kwargs):
+class Block1(keras.layers.Layer):
+    def __init__(self, num_filters=32, kernel_size=1, reg_param=0.0001, **kwargs):
         super(Block1, self).__init__(**kwargs)
 
         # Creating layers
-        self.conv = keras.layers.Conv1D(filters=32, kernel_size=1)
+        self.conv = keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_size, kernel_regularizer=keras.regularizers.l2(reg_param))
         self.bn = keras.layers.BatchNormalization()
         
         def __call__(self, x, is_training):
@@ -38,18 +38,21 @@ class Block1(tf.Module):
 
             return x
 
-class Block2i(tf.Module):
-    def __init__(self, filter_num=32, **kwargs):
+class Block2i(keras.layers.Layer):
+    def __init__(self, num_filters=32, kernel_size=3, reg_param=0.0001, **kwargs):
         super(Block2i, self).__init__(**kwargs)
 
         # Creating layers
-        self.conv1 = keras.layers.Conv1D(filters=filter_num,
-                                         kernel_size=3,
-                                         padding="same")
+        self.conv1 = keras.layers.Conv1D(filters=num_filters,
+                                         kernel_size=kernel_size,
+                                         padding="same",
+                                         kernel_regularizer=keras.regularizers.l2(reg_param)
+                                         )
         self.bn1 = keras.layers.BatchNormalization()
 
-        self.conv2 = keras.layers.Conv1D(filters=filter_num,
-                                         kernel_size=3,
+        self.conv2 = keras.layers.Conv1D(filters=num_filters,
+                                         kernel_size=kernel_size,
+                                         kernel_regularizer=keras.regularizers.l2(reg_param),
                                          padding="same")
         self.bn2 = keras.layers.BatchNormalization()
 
@@ -70,21 +73,21 @@ class Block2i(tf.Module):
             return x + shortcut
 
 
-class Block3(tf.Module):
-    def __init__(self, **kwargs):
+class Block3(keras.layers.Layer):
+    def __init__(self, reg_param=0.0001, **kwargs):
         super(Block3, self).__init__(**kwargs)
 
         # Creating layers
 
         self.flatten = keras.layers.Flatten()
 
-        self.dense1 = keras.layers.Dense(64)
+        self.dense1 = keras.layers.Dense(64, kernel_regularizer=keras.regularizers.l2(reg_param))
         self.bn1 = keras.layers.BatchNormalization()
 
-        self.dense2 = keras.layers.Dense(64)
+        self.dense2 = keras.layers.Dense(64, kernel_regularizer=keras.regularizers.l2(reg_param))
         self.bn2 = keras.layers.BatchNormalization()
 
-        self.final = keras.layers.Dense(1)
+        self.final = keras.layers.Dense(1, kernel_regularizer=keras.regularizers.l2(reg_param))
 
     def __call__(self, x, is_training):
 
@@ -112,13 +115,13 @@ class Block3(tf.Module):
 model = SpeckModel()
 model.compile(
         optimizer=keras.optimizers.Adam(),
-        loss = keras.losses.SparceCategoricalCrossentropy(),
-        metrics=[keras.metrics.SparseCategoricalAccuracy()],
+        loss = keras.losses.BinaryCrossentropy(),
+        metrics=["acc"],
         )
 history = model.fit(
         x_train,
         y_train,
-        batch_size=2500,
+        batch_size=50000,
         epochs=10,
         validation_data=(x_val, y_val)
         )
