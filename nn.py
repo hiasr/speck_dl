@@ -14,10 +14,52 @@ def build_model(depth=10):
 
     outputs = Block3()(x)
 
-    model = keras.Model(inputs=inputs, outputs=outputs, name="Speck Model")
+    model = keras.Model(inputs=inputs, outputs=outputs)
 
     return model
+
+def build_model1(depth=10, num_filters=32, kernel_size=3, reg_param=10**-5):
+    inputs = keras.Input(shape=(2*32,))
+    x = keras.layers.Reshape((-1, 16))(inputs)
+    x = keras.layers.Permute((2,1))(x)
     
+    # Block 1
+    x = keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_size, kernel_regularizer=keras.regularizers.l2(reg_param))(x)
+    x = keras.layers.BatchNormalization()(x)
+
+    # Block 2-i
+    for _ in range(depth):
+        shortcut = x
+        x = keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_size, padding="same", kernel_regularizer=keras.regularizers.l2(reg_param))(x)
+        x = keras.layers.BatchNormalization()(x)
+        x = keras.layers.Activation('relu')
+
+        x = keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_size, padding="same", kernel_regularizer=keras.regularizers.l2(reg_param))(x)
+        x = keras.layers.BatchNormalization()(x)
+        x = keras.layers.Activation('relu')
+
+        x = keras.layers.Add()([x, shortcut])
+    
+    # Block 3
+    x = keras.layers.Flatten()(x)
+    x = keras.layers.Dense(64, kernel_regularizer=keras.regularizers.l2(reg_param))(x)
+    x = keras.layers.BatchNormalization()(x)
+    x = keras.layers.Activation('relu')(x)
+
+    x = keras.layers.Dense(64, kernel_regularizer=keras.regularizers.l2(reg_param))(x)
+    x = keras.layers.BatchNormalization()(x)
+    x = keras.layers.Activation('relu')(x)
+
+    x = keras.layers.Dense(1, kernel_regularizer=keras.regularizers.l2(reg_param))(x)
+    output = keras.layers.Activation(x)
+    model = keras.Model(inputs=inputs, outputs=output)
+    return model
+
+
+    
+        
+        
+        
 
 class SpeckModel(keras.Model):
     def __init__(self, depth=10, reg_param=0.0001, **kwargs):
@@ -148,7 +190,8 @@ if __name__ == "__main__":
     check = make_checkpoint("./fresh_models/"+'best'+str(5)+'depth'+str(10)+'.h5');
 
     # model = SpeckModel(depth=10, reg_param=10**-5)
-    model = build_model()
+    model = build_model1()
+    # model = build_model()
     model.compile(
             optimizer=keras.optimizers.Adam(),
             loss = keras.losses.BinaryCrossentropy(),
