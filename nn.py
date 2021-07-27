@@ -20,8 +20,11 @@ def build_model(depth=10):
 
 def build_model1(depth=10, num_filters=32, kernel_size=3, reg_param=10**-5):
     inputs = keras.Input(shape=(2*32,))
+    print(type(inputs))
     x = keras.layers.Reshape((-1, 16))(inputs)
+    print(type(x))
     x = keras.layers.Permute((2,1))(x)
+    print(type(x))
     
     # Block 1
     x = keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_size, kernel_regularizer=keras.regularizers.l2(reg_param))(x)
@@ -32,11 +35,11 @@ def build_model1(depth=10, num_filters=32, kernel_size=3, reg_param=10**-5):
         shortcut = x
         x = keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_size, padding="same", kernel_regularizer=keras.regularizers.l2(reg_param))(x)
         x = keras.layers.BatchNormalization()(x)
-        x = keras.layers.Activation('relu')
+        x = keras.layers.Activation('relu')(x)
 
         x = keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_size, padding="same", kernel_regularizer=keras.regularizers.l2(reg_param))(x)
         x = keras.layers.BatchNormalization()(x)
-        x = keras.layers.Activation('relu')
+        x = keras.layers.Activation('relu')(x)
 
         x = keras.layers.Add()([x, shortcut])
     
@@ -51,7 +54,7 @@ def build_model1(depth=10, num_filters=32, kernel_size=3, reg_param=10**-5):
     x = keras.layers.Activation('relu')(x)
 
     x = keras.layers.Dense(1, kernel_regularizer=keras.regularizers.l2(reg_param))(x)
-    output = keras.layers.Activation(x)
+    output = keras.layers.Activation('sigmoid')(x)
     model = keras.Model(inputs=inputs, outputs=output)
     return model
 
