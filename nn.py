@@ -11,6 +11,9 @@ class SpeckModel(keras.Model):
         self.block3 = Block3(reg_param=reg_param)
 
     def call(self, inputs, training=False):
+
+        x = keras.layers.Reshape((-1, 16))(inputs);
+        x = keras.layers.Permute((2,1))(x);
         x = self.block1(inputs)
         for res_block in self.res_tower:
             x = res_block(x)
