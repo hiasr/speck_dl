@@ -110,7 +110,11 @@ class Block3(keras.layers.Layer):
 
 def cyclic_lr(num_epochs, high_lr, low_lr):
     res = lambda i: low_lr + ((num_epochs-1) - i % num_epochs)/(num_epochs-1) * (high_lr - low_lr);
-    return(res);
+    return res;
+
+def make_checkpoint(datei):
+  res = keras.callbacks.ModelCheckpoint(datei, monitor='val_loss', save_best_only = True);
+  return(res);
 
 if __name__ == "__main__":
 
@@ -118,6 +122,7 @@ if __name__ == "__main__":
     x_val, y_val = speck.make_train_data(10**6, 5)
 
     lr = keras.callbacks.LearningRateScheduler(cyclic_lr(10,0.002, 0.0001));
+    check = make_checkpoint("./fresh_models/"+'best'+str(5)+'depth'+str(10)+'.h5');
 
     model = SpeckModel(depth=10, reg_param=10**-5)
     model.compile(
