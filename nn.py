@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 import speck
+import datetime
 
 class SpeckModel(keras.Model):
     def __init__(self, depth=10, reg_param=0.0001, **kwargs):
@@ -124,6 +125,9 @@ if __name__ == "__main__":
     x_train, y_train = speck.make_train_data(10**7, 5) 
     x_val, y_val = speck.make_train_data(10**6, 5)
 
+    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
     lr = keras.callbacks.LearningRateScheduler(cyclic_lr(10,0.002, 0.0001));
     check = make_checkpoint("./fresh_models/"+'best'+str(5)+'depth'+str(10)+'.h5');
 
@@ -138,7 +142,8 @@ if __name__ == "__main__":
             y_train,
             batch_size=5000,
             epochs=200,
-            validation_data=(x_val, y_val)
+            validation_data=(x_val, y_val),
+            callbacks=[lr, check, tensorboard_callback]
             )
 # 
 # print("Creating jpg...")
