@@ -3,6 +3,22 @@ from tensorflow import keras
 import speck
 import datetime
 
+
+def build_model(depth=10):
+    inputs = keras.Input(shape=(2*32,)) 
+
+    x = Block1()(inputs)
+
+    for _ in range(depth):
+        x = Block2i()(x)
+
+    outputs = Block3()(x)
+
+    model = keras.Model(inputs=inputs, outputs=outputs, name="Speck Model")
+
+    return model
+    
+
 class SpeckModel(keras.Model):
     def __init__(self, depth=10, reg_param=0.0001, **kwargs):
         super(SpeckModel, self).__init__(**kwargs)
@@ -91,7 +107,7 @@ class Block3(keras.layers.Layer):
 
         self.final = keras.layers.Dense(1, kernel_regularizer=keras.regularizers.l2(reg_param))
 
-    def __call__(self, x, is_training):
+    def __call__(self, x, is_training=False):
 
         # Building the block
         x = self.flatten(x)
@@ -131,7 +147,8 @@ if __name__ == "__main__":
     lr = keras.callbacks.LearningRateScheduler(cyclic_lr(10,0.002, 0.0001));
     check = make_checkpoint("./fresh_models/"+'best'+str(5)+'depth'+str(10)+'.h5');
 
-    model = SpeckModel(depth=10, reg_param=10**-5)
+    # model = SpeckModel(depth=10, reg_param=10**-5)
+    model = build_model()
     model.compile(
             optimizer=keras.optimizers.Adam(),
             loss = keras.losses.BinaryCrossentropy(),
