@@ -57,8 +57,8 @@ def test(dataloader, model, loss_fn):
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
-            pred = model(X)
-            test_loss += loss_fn(pred, y).item()
+            pred = model(X.float())
+            test_loss += loss_fn(pred.float().reshape((-1,)), y.float()).item()
             correct += (pred.argmax(1)==y).type(torch.float).sum().item()
     test_loss /= num_batches
     correct /= size
