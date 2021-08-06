@@ -42,18 +42,14 @@ class NeuralNetwork(nn.Module):
 
         # Preparing input
         x = torch.reshape(x, (-1,4,16))
-        print(x.shape)
         # x = x.permute((0,2,1))
 
         # Applying all layers
         x = self.block1(x)
-        print(x.shape)
 
         for block in self.block2:
             x = block(x) + x
-            print(x.shape)
 
         x = self.block3(x)
-        print(x.shape)
 
         return x
