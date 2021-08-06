@@ -62,7 +62,7 @@ def test(dataloader, model, loss_fn):
             # correct += (pred.argmax(1)==y).type(torch.float).sum().item()
             correct += (pred.round()==y).type(torch.float).sum().item()
     test_loss /= num_batches
-    correct /= size
+    correct /= size*num_batches
     print("Test Error: \nAccuracy: {:>0.1f}, Avg loss: {:>8f} \n".format(100*correct, test_loss))
 
 epochs = 5
