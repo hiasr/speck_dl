@@ -9,7 +9,7 @@ print("Creating Data...")
 print("---" * 30)
 
 # Create training and test data
-training_data = SpeckDataset(5, 10**6)
+training_data = SpeckDataset(5, 10**7)
 test_data = SpeckDataset(5, 10**5)
 
 # Creating the DataLoaders
@@ -59,7 +59,8 @@ def test(dataloader, model, loss_fn):
             X, y = X.to(device), y.to(device)
             pred = model(X.float())
             test_loss += loss_fn(pred.float().reshape((-1,)), y.float()).item()
-            correct += (pred.argmax(1)==y).type(torch.float).sum().item()
+            # correct += (pred.argmax(1)==y).type(torch.float).sum().item()
+            correct += (pred.round()==y).type(torch.float).sum().item()
     test_loss /= num_batches
     correct /= size
     print("Test Error: \nAccuracy: {:>0.1f}, Avg loss: {:>8f} \n".format(100*correct, test_loss))
