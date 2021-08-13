@@ -33,6 +33,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
+    batch_size = dataloader.batch_size
     for batch, (X,y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
 
@@ -47,7 +48,7 @@ def train(dataloader, model, loss_fn, optimizer):
 
         if (batch % 100) == 0:
             loss, current = loss.item(), batch*len(X)
-            print("Loss: {:>7f}   [{:>5d}/{:>5d}]".format(loss, current, size))
+            print("Loss: {:>7f}   [{:>5d}/{:>5d}]".format(loss, current/batch_size, size/batch_size))
 
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
