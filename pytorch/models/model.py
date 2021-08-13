@@ -52,4 +52,5 @@ class NeuralNetwork(nn.Module):
 
         x = self.block3(x)
 
-        return x
+
+        return x.reshape((-1,))

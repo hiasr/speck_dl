@@ -10,7 +10,7 @@ print("---" * 30)
 
 # Create training and test data
 training_data = SpeckDataset(5, 10**7)
-test_data = SpeckDataset(5, 10**5)
+test_data = SpeckDataset(5, 10**6)
 
 # Creating the DataLoaders
 batch_size = 5000
@@ -54,18 +54,21 @@ def test(dataloader, model, loss_fn):
     num_batches = len(dataloader)
     model.eval()
     test_loss, correct = 0,0
+    amount = 0
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X.float())
+
             test_loss += loss_fn(pred.float().reshape((-1,)), y.float()).item()
-            # correct += (pred.argmax(1)==y).type(torch.float).sum().item()
-            correct += (pred.round()==y).type(torch.float).sum().item()
+            amount += len(y)
+            correct += torch.eq(torch.ge(pred, 0.5), y).sum().item()
+
     test_loss /= num_batches
-    correct /= size*num_batches
+    correct /= size
     print("Test Error: \nAccuracy: {:>0.1f}, Avg loss: {:>8f} \n".format(100*correct, test_loss))
 
-epochs = 5
+epochs = 200
 for t in range(epochs):
     print("Epoch {}: \n".format(t+1) + "--"*30)
     train(train_dataloader, model, loss_fn, optimizer)
