@@ -6,7 +6,7 @@ from datasets.DataLoader import SpeckDataset
 from models.model import NeuralNetwork
 
 print("Creating Data...")
-print("---" * 30)
+print("--" * 30)
 
 # Create training and test data
 training_data = SpeckDataset(5, 10**7)
@@ -19,7 +19,7 @@ train_dataloader = DataLoader(training_data, batch_size)
 test_dataloader = DataLoader(test_data, 5000)
 
 print("Setting up neural network")
-print("---" * 30)
+print("--" * 30)
 
 # Checking if gpu is available
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -55,14 +55,12 @@ def test(dataloader, model, loss_fn):
     num_batches = len(dataloader)
     model.eval()
     test_loss, correct = 0,0
-    amount = 0
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X.float())
 
             test_loss += loss_fn(pred.float().reshape((-1,)), y.float()).item()
-            amount += len(y)
             correct += torch.eq(torch.ge(pred, 0.5), y).sum().item()
 
     test_loss /= num_batches
