@@ -23,6 +23,7 @@ class NeuralNetwork(nn.Module):
                 nn.ReLU(),
 
                 ) for _ in range(10)])
+
         self.block3 = nn.Sequential(
                 nn.Flatten(),
 

@@ -1,10 +1,11 @@
 import torch
 
-tensor = torch.tensor([[0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0,
-        0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0,
-        1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0]], dtype=torch.uint8)
-tensor = torch.reshape(tensor, (-1,4,16))
-print(tensor[0])
-tensor = torch.permute(tensor, (0,2,1))
-print(tensor[0])
-
+t = torch.tensor([[[k +16*i for k in range(16)] for i in range(5)] for _ in range(10)])
+print(t)
+print(t.shape)
+t = t.permute((0,2,1))
+print(t)
+print(t.shape)
+t = t.reshape((-1,16,5))
+print(t)
+print(t.shape)

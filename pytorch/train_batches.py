@@ -5,7 +5,9 @@ from torch.utils.data import DataLoader
 from datasets.DataLoader import SpeckDataset
 from models.model import NeuralNetwork
 
-print("Creating Data...")
+
+
+print("Loading Data...")
 print("--" * 30)
 
 # Create training and test data
@@ -18,7 +20,7 @@ batch_size = 5000
 train_dataloader = DataLoader(training_data, batch_size)
 test_dataloader = DataLoader(test_data, 5000)
 
-print("Setting up neural network")
+print("Initializing neural network")
 print("--" * 30)
 
 # Checking if gpu is available
