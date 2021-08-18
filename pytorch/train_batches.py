@@ -11,11 +11,11 @@ print("Loading Data...")
 print("--" * 30)
 
 # Create training and test data
-training_data = SpeckDataset(5, 10**5, 5)
+training_data = SpeckDataset(5, 10**7, 5)
 test_data = SpeckDataset(5, 10**5)
 
 # Creating the DataLoaders
-batch_size = 50
+batch_size = 5000
 
 train_dataloader = DataLoader(training_data, batch_size)
 test_dataloader = DataLoader(test_data, 5000)
@@ -32,6 +32,7 @@ model = NeuralNetwork().to(device)
 
 loss_fn = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, 1e-4, 1e-2, cycle_momentum=False)
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
@@ -47,10 +48,11 @@ def train(dataloader, model, loss_fn, optimizer):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        scheduler.step()
 
         if (batch % 100) == 0:
             loss, current = loss.item(), batch*len(X)
-            print("Loss: {:>7f}   [{:>5d}/{:>5d}]".format(loss, current//batch_size, size//batch_size))
+            print("Loss: {:>7f}   [{:d}/{:d}]".format(loss, current//batch_size, size//batch_size))
 
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)

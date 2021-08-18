@@ -26,6 +26,8 @@ def generate_data(rounds: int=5, n: int=10**7, N: int=1, diff=(0x0040, 0x0000)):
         - diff: The difference between the plaintext 
         - N: The size of mini-batches (all generated from the same key)
     """
+    # REMOVE THIS WHEN WORKING WITH BATCHES
+    N=1
     # Dividing the number of samples by the size of the batch to be consistent
     n //= N
 
