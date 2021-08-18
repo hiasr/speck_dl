@@ -46,7 +46,7 @@ def generate_data(rounds: int=5, n: int=10**7, N: int=1, diff=(0x0040, 0x0000)):
         plain1r = plain0r ^ diff[1];
 
         # Generating labels (1=real; 0=random)
-        Y_batch = np.frombuffer(urandom(n), dtype=np.uint8); Y = Y & 1;
+        Y_batch = np.frombuffer(urandom(n), dtype=np.uint8) & 1
 
         # Replace the pairs with label 0 with random plaintext
         num_rand_samples = np.sum(Y_batch==0)

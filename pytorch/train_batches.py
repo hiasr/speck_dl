@@ -11,11 +11,11 @@ print("Loading Data...")
 print("--" * 30)
 
 # Create training and test data
-training_data = SpeckDataset(5, 10**6, 5)
+training_data = SpeckDataset(5, 10**5, 5)
 test_data = SpeckDataset(5, 10**5)
 
 # Creating the DataLoaders
-batch_size = 5
+batch_size = 50
 
 train_dataloader = DataLoader(training_data, batch_size)
 test_dataloader = DataLoader(test_data, 5000)
