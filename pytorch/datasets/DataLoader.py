@@ -14,7 +14,7 @@ class SpeckDataset(Dataset):
         return len(self.Y)
 
     def __getitem__(self, idx):
-        sample = (self.X[idx], self.Y[idx])
+        sample = (self.X[:,idx,:,:], self.Y[:,idx,:,:])
         return torch.tensor(sample[0]), torch.tensor(sample[1]) 
 
 
