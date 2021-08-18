@@ -11,11 +11,11 @@ print("Loading Data...")
 print("--" * 30)
 
 # Create training and test data
-training_data = SpeckDataset(5, 10**7)
-test_data = SpeckDataset(5, 10**6)
+training_data = SpeckDataset(5, 10**6, 5)
+test_data = SpeckDataset(5, 10**5)
 
 # Creating the DataLoaders
-batch_size = 5000
+batch_size = 5
 
 train_dataloader = DataLoader(training_data, batch_size)
 test_dataloader = DataLoader(test_data, 5000)
@@ -50,7 +50,7 @@ def train(dataloader, model, loss_fn, optimizer):
 
         if (batch % 100) == 0:
             loss, current = loss.item(), batch*len(X)
-            print("Loss: {:>7f}   [{:>5d}/{:>5d}]".format(loss, current/batch_size, size/batch_size))
+            print("Loss: {:>7f}   [{:>5d}/{:>5d}]".format(loss, current//batch_size, size//batch_size))
 
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
