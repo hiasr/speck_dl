@@ -15,17 +15,16 @@ training_data = SpeckDataset(5, 10**6, 5)
 test_data = SpeckDataset(5, 10**5)
 
 # Creating the DataLoaders
-batch_size = 5000
+batch_size = 500
 
 train_dataloader = DataLoader(training_data, batch_size, shuffle=True)
-test_dataloader = DataLoader(test_data, 5000, shuffle=True)
+test_dataloader = DataLoader(test_data, 500, shuffle=True)
 
 print("Initializing neural network")
 print("--" * 30)
 
 # Checking if gpu is available
 device = "cuda" if torch.cuda.is_available() else "cpu"
-device="cpu"
 print("Using device: {}".format(device))
 
 
@@ -41,9 +40,16 @@ def train(dataloader, model, loss_fn, optimizer):
     for batch, (X,y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
 
+        predictions = torch.empty((y.shape[0],X.shape[-1]))
+
         # Compute prediction error
-        pred = model(X.float())
-        loss = loss_fn(pred.float().reshape((-1,)), y.float())
+        for group in range(5):
+            predictions[:,group] = model(X[:,:,:,group].float())
+
+        
+        prediction_avg = predictions.mean(axis=1).to(device)
+        
+        loss = loss_fn(prediction_avg.float().reshape((-1,)), y.float())
 
         #Backpropagation
         optimizer.zero_grad()
