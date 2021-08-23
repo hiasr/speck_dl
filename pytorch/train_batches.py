@@ -12,7 +12,7 @@ print("--" * 30)
 
 # Create training and test data
 training_data = SpeckDataset(5, 10**6, 5)
-test_data = SpeckDataset(5, 10**5)
+test_data = SpeckDataset(5, 10**5, 5)
 
 # Creating the DataLoaders
 batch_size = 500
@@ -69,9 +69,17 @@ def test(dataloader, model, loss_fn):
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
-            pred = model(X.float())
 
-            test_loss += loss_fn(pred.float().reshape((-1,)), y.float()).item()
+            predictions = torch.empty((y.shape[0],X.shape[-1]))
+
+            # Compute prediction error
+            for group in range(5):
+                predictions[:,group] = model(X[:,:,:,group].float())
+
+            
+            prediction_avg = predictions.mean(axis=1).to(device)
+
+            test_loss += loss_fn(prediction_avg.float().reshape((-1,)), y.float()).item()
             correct += torch.eq(torch.ge(pred, 0.5), y).sum().item()
 
     test_loss /= num_batches
