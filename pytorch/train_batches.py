@@ -67,8 +67,9 @@ def test(dataloader, dataloader_batched, model, loss_fn):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     model.eval()
-    test_loss, correct = 0,0
+    
     # Non Batched validation
+    test_loss, correct = 0,0
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
@@ -77,8 +78,13 @@ def test(dataloader, dataloader_batched, model, loss_fn):
 
             test_loss += loss_fn(prediction.float().reshape((-1,)), y.float()).item()
             correct += torch.eq(torch.ge(prediction, 0.5), y).sum().item()
+    test_loss /= num_batches
+    correct /= size
 
     # Batched accuracy
+    size = len(dataloader_batched.dataset)
+    num_batches = len(dataloader_batched)
+    test_loss_batched, correct_batched = 0,0
     with torch.no_grad():
         for X, y in dataloader_batched:
             X, y = X.to(device), y.to(device)
@@ -94,8 +100,9 @@ def test(dataloader, dataloader_batched, model, loss_fn):
             test_loss_batched += loss_fn(prediction_avg.float().reshape((-1,)), y.float()).item()
             correct_batched += torch.eq(torch.ge(prediction_avg, 0.5), y).sum().item()
 
-    test_loss /= num_batches
-    correct /= size
+    test_loss_batched /= num_batches
+    correct_batched /= size
+
     print("Test Error: \nAccuracy: {:>0.1f}%, Avg loss: {:>8f} \n".format(100*correct, test_loss))
     print("Test Error Batched: \nAccuracy: {:>0.1f}%, Avg loss: {:>8f} \n".format(100*correct_batched, test_loss_batched))
 
