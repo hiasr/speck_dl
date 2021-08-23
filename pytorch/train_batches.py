@@ -11,28 +11,29 @@ print("Loading Data...")
 print("--" * 30)
 
 # Create training and test data
-training_data = SpeckDataset(5, 10**7, 5)
+training_data = SpeckDataset(5, 10**6, 5)
 test_data = SpeckDataset(5, 10**5)
 
 # Creating the DataLoaders
 batch_size = 5000
 
-train_dataloader = DataLoader(training_data, batch_size)
-test_dataloader = DataLoader(test_data, 5000)
+train_dataloader = DataLoader(training_data, batch_size, shuffle=True)
+test_dataloader = DataLoader(test_data, 5000, shuffle=True)
 
 print("Initializing neural network")
 print("--" * 30)
 
 # Checking if gpu is available
 device = "cuda" if torch.cuda.is_available() else "cpu"
+device="cpu"
 print("Using device: {}".format(device))
 
 
 model = NeuralNetwork().to(device)
 
 loss_fn = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, 1e-4, 1e-2, cycle_momentum=False)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, 1e-4, 1e-3, cycle_momentum=False)
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
