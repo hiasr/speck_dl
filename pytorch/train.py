@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from datasets.DataLoader import SpeckDataset
 from models.model import NeuralNetwork
 
+
 print("Creating Data...")
 print("--" * 30)
 
@@ -16,7 +17,7 @@ test_data = SpeckDataset(5, 10**6)
 batch_size = 5000
 
 train_dataloader = DataLoader(training_data, batch_size)
-test_dataloader = DataLoader(test_data, 5000)
+test_dataloader = DataLoader(test_data, batch_size)
 
 print("Setting up neural network")
 print("--" * 30)
@@ -26,10 +27,12 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using device: {}".format(device))
 
 
-model = NeuralNetwork().to(device)
+model = NeuralNetwork()
+model = nn.DataParallel(model).to(device)
 
 loss_fn = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, 1e-4, 1e-3, cycle_momentum=False)
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
@@ -45,10 +48,11 @@ def train(dataloader, model, loss_fn, optimizer):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        scheduler.step()
 
         if (batch % 100) == 0:
             loss, current = loss.item(), batch*len(X)
-            print("Loss: {:>7f}   [{:>5d}/{:>5d}]".format(loss, current/batch_size, size/batch_size))
+            print("Loss: {:>7f}   [{:>5d}/{:>5d}]".format(loss, current//batch_size, size//batch_size))
 
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
@@ -67,11 +71,13 @@ def test(dataloader, model, loss_fn):
     correct /= size
     print("Test Error: \nAccuracy: {:>0.1f}%, Avg loss: {:>8f} \n".format(100*correct, test_loss))
 
-epochs = 200
+epochs = 50
 for t in range(epochs):
     print("Epoch {}: \n".format(t+1) + "--"*30)
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model, loss_fn)
+torch.save(model.state_dict(), "model_5r_save_dict.pth")
+torch.save(model, "model_5r.pth")
 print("Done!")
 
     
