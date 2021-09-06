@@ -1,11 +1,11 @@
 from torch.utils.data import Dataset
 import torch
 import numpy as np
-import aes_224 as aes
+import datasets.aes_224 as aes
 from os import urandom
 
 class AesDataset(Dataset):
-    def __init__(self, rounds, data_size, transform=None):
+    def __init__(self, rounds, data_size, batch_size=1, transform=None):
         self.X, self.Y = generate_data(rounds, data_size, batch_size)
 
     def __len__(self):
