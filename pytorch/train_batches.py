@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-from datasets.DataLoader import SpeckDataset
+from datasets.DataLoader_speck import SpeckDataset
 from models.model import NeuralNetwork
 
 
