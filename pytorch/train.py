@@ -31,7 +31,7 @@ model = NeuralNetwork()
 model = nn.DataParallel(model).to(device)
 
 loss_fn = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
 scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, 1e-4, 1e-3, cycle_momentum=False)
 
 def train(dataloader, model, loss_fn, optimizer):
